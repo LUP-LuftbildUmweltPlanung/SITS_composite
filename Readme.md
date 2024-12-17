@@ -27,9 +27,9 @@ To use the scripts:
 
 It is necessary to describe the final user structure of the repo, an overview would be like this:
 
-#### L1C Script
-#### L2A Script
-#### SITS Classification (composed of 3 (2) main scripts)
+* L1C Script
+* L2A Script
+* SITS Classification (composed of 3 (2) main scripts)
 
 Refer to the horsepower of the PC (the idea mentioned in the [FORCE L1A](https://force-eo.readthedocs.io/en/latest/howto/l2-ard.html) Website
 
@@ -44,7 +44,6 @@ Refer to the horsepower of the PC (the idea mentioned in the [FORCE L1A](https:/
 ## Authors
 
 * [Sebastian Valencia](https://github.com/Azarozo19)
-* 
 
 
 ## License
