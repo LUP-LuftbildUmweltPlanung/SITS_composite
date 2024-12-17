@@ -41,20 +41,6 @@ Refer to the horsepower of the PC (the idea mentioned in the [FORCE L1A](https:/
 
 ### c) SITS classification
 
-
-
-## Help
-
-Any advise for common problems or issues.
-```
-command to run if program contains helper info
-```
-
-## Authors
-
-Contributors names / contact info / GitHub Acc
-
-
 ## Authors
 
 * [Sebastian Valencia](https://github.com/Azarozo19)
