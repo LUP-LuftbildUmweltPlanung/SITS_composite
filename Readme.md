@@ -1,17 +1,28 @@
-# Project Title
+# SITS bands composite
 
-Simple overview of use/purpose.
+Code for Satellite Image Time Series (SITS) composite based on [FORCE Tme Series framework](https://force-eo.readthedocs.io/en/latest/index.html).
 
-## Description
+## 1. Installing
 
-An in-depth paragraph about your project and overview of use.
+Refer to the repository [SITS Classification](https://github.com/LUP-LuftbildUmweltPlanung/SITS_classification) for parameters installations 
 
-## Getting Started
+## 2. Getting Started
 
-### Dependencies
+### Basics
 
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
+The script is based on the following folder structure:
+
+IMAGE
+
+To use the scripts:
+
+It is necessary to describe the final user structure of the repo, an overview would be like this:
+
+#### L1C Script
+#### L2A Script
+#### SITS Classification (composed of 3 (2) main scripts)
+
+Refer to the horsepower of the PC (the idea mentioned in the [FORCE L1A](https://force-eo.readthedocs.io/en/latest/howto/l2-ard.html) Website
 
 ### Installing
 
