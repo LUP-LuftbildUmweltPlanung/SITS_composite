@@ -48,7 +48,7 @@ Refer to the horsepower of the PC (the idea mentioned in the [FORCE L1A](https:/
 
 ## License
 
-This project is licensed under the [GNU General Public Licence, Version 3 (GPLv3)] - see the LICENSE.md file for details
+This project is licensed under the GNU General Public Licence, Version 3 (GPLv3) - see the LICENSE.md file for details
 
 ## References
 
