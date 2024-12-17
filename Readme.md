@@ -1,10 +1,19 @@
 # SITS bands composite
 
-Code for Satellite Image Time Series (SITS) composite based on [FORCE Tme Series framework](https://force-eo.readthedocs.io/en/latest/index.html).
+Code for Satellite Image Time Series (SITS) composite based on [FORCE Tme Series framework](https://force-eo.readthedocs.io/en/latest/index.html)
 
 ## 1. Installing
 
 Refer to the repository [SITS Classification](https://github.com/LUP-LuftbildUmweltPlanung/SITS_classification) for parameters installations 
+
+
+```
+conda create --name SITSclass python==3.9
+conda activate SITSclass
+cd /path/to/repository/SITS_composite
+pip install -r requirements.txt
+sudo apt-get install xterm
+```
 
 ## 2. Getting Started
 
@@ -24,18 +33,15 @@ It is necessary to describe the final user structure of the repo, an overview wo
 
 Refer to the horsepower of the PC (the idea mentioned in the [FORCE L1A](https://force-eo.readthedocs.io/en/latest/howto/l2-ard.html) Website
 
-### Installing
+## 3. Workflow
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
+### a) L1C
 
-### Executing program
+### b) L2A
 
-* How to run the program
-* Step-by-step bullets
-```
-code blocks for commands
-```
+### c) SITS classification
+
+
 
 ## Help
 
@@ -49,14 +55,15 @@ command to run if program contains helper info
 Contributors names / contact info / GitHub Acc
 
 
-## Known Issues
+## Authors
 
-* list known issues or limitations
+* [Sebastian Valencia](https://github.com/Azarozo19)
+* 
 
 
 ## License
 
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+This project is licensed under the [GNU General Public Licence, Version 3 (GPLv3)] - see the LICENSE.md file for details
 
 ## References
 
