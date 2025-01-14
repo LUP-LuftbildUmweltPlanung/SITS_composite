@@ -3,12 +3,14 @@ import subprocess
 import math
 import os
 
+
+
 #DEM_NODATA = -32768
-def reproject_to_wgs84(shapefile_path):
+def reproject_to_wgs84(aois):
     """
     Reproject the shapefile to WGS84.
     """
-    gdf = gpd.read_file(shapefile_path)
+    gdf = gpd.read_file(aois)
     gdf_wgs84 = gdf.to_crs("EPSG:4326")
     return gdf_wgs84
 
@@ -59,13 +61,29 @@ def create_txt_and_vrt(output_dir, txt_file_path, vrt_file_path):
     subprocess.run(gdal_command, shell=True)
 
 
-def main():
-    shapefile_path = input("Enter the path to your shapefile: ")
-    output_dir = input("Enter the output directory for downloaded DEMs: ")
+def download_dem(base_path, aois):
+    """
+    Download DEM files for the specified AOI and save them to the predefined DEM folder.
+
+    Parameters:
+        base_path (str): The base path where the folder structure has been created.
+        aois (str): Path to the AOIs shapefile.
+    """
+    # Define the output directory for DEMs
+    output_dem_dir = os.path.join(base_path, "process/temp/dem")
+
+    # Ensure the AOI shapefile exists
+    if not os.path.exists(aois):
+        raise FileNotFoundError(f"The shapefile '{aois}' does not exist.")
+
+    # Ensure the DEM output directory exists
+    if not os.path.exists(output_dem_dir):
+        os.makedirs(output_dem_dir)
+        print(f"Created DEM directory: {output_dem_dir}")
 
     # Step 1: Reproject the shapefile to WGS84
     print("Reprojecting shapefile to WGS84...")
-    gdf_wgs84 = reproject_to_wgs84(shapefile_path)
+    gdf_wgs84 = reproject_to_wgs84(aois)
 
     # Step 2: Extract extent and format as tiles
     print("Extracting extent and formatting to tile names...")
@@ -74,7 +92,7 @@ def main():
 
     # Step 3: Generate AWS S3 command
     print("Generating AWS S3 command...")
-    aws_command = generate_aws_command(tiles, output_dir)
+    aws_command = generate_aws_command(tiles, output_dem_dir)
     print(f"Generated AWS command:\n{aws_command}")
 
     # Optional: Execute the AWS command
@@ -83,14 +101,14 @@ def main():
         subprocess.run(aws_command, shell=True)
 
     # Step 4: Create the .txt and .vrt files
-    txt_file_path = os.path.join(output_dir, "nasa.txt")
-    vrt_file_path = os.path.join(output_dir, "nasa.vrt")
+    txt_file_path = os.path.join(output_dem_dir, "nasa.txt")
+    vrt_file_path = os.path.join(output_dem_dir, "nasa.vrt")
     print(f"Creating {txt_file_path} and {vrt_file_path}...")
-    create_txt_and_vrt(output_dir, txt_file_path, vrt_file_path)
+    create_txt_and_vrt(output_dem_dir, txt_file_path, vrt_file_path)
 
     # Step 5: Output the VRT file path for the .prm file
     print(f"VRT file created at: {vrt_file_path}")
 
 
 if __name__ == "__main__":
-    main()
+    download_dem()
