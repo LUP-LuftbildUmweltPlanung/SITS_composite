@@ -1,10 +1,12 @@
 # SITS bands composite
 
-Code for Satellite Image Time Series (SITS) composite based on [FORCE Tme Series framework](https://force-eo.readthedocs.io/en/latest/index.html)
+SITS bands composite allows you to download high quality Level 1C - 2A data from Sentinel 2A, 2B and Landsat LT04, LT05, LE07, LC08; 
+from your area of Interest (aoi) including the associated DEM. 
+The code uses Satellite Image Time Series (SITS) composite based on [FORCE Time Series framework](https://force-eo.readthedocs.io/en/latest/index.html).
 
 ## 1. Installing
 
-Refer to the repository [SITS Classification](https://github.com/LUP-LuftbildUmweltPlanung/SITS_classification) for parameters installations 
+The basic parameters installations are:
 
 ```
 conda create --name SITScomp python==3.9
@@ -14,20 +16,16 @@ pip install -r requirements.txt
 sudo apt install gdal-bin aws-cli
 ```
 Notes: 
-The repository is build upon FORCE-Datacube and - Framework (Docker, recommended FORCE-Version 3.7.11)
-[How to install FORCE with Docker](https://force-eo.readthedocs.io/en/latest/setup/docker.html#docker)
-
-The code is build upon CUDA 11.4
-
-_Can also work with other versions but be careful with other libraries or changed functionalities_
+The repository is build upon FORCE-Datacube and Framework (Docker, recommended FORCE-Version 3.7.11). Check
+[How to install FORCE with Docker](https://force-eo.readthedocs.io/en/latest/setup/docker.html#docker) for more information.
 
 ## 2. Getting Started
 
-### Previous setup before running the script
+### Previous setup before running the script.
 
-Currently, Landsat data can be downloaded without a login, but downloading Sentinel-2  
-data requires authentication. This is done through gcloud only needs to be done once before the first run. 
-Running gcloud will create a file called .boto normally in your home user directory (you will need to define it's location within the main script).
+Currently, Landsat data can be downloaded without a login, but downloading Sentinel-2 data requires authentication. 
+This is done through gcloud, and it only needs to be done once before the first run. Running gcloud will create a 
+.boto file,normally in your home user directory (you will need to define it's location within the main script).
 You can follow the instructions on 
 [the gcloud services](https://cloud.google.com/sdk/docs/install) website. Check the [Level-1C FORCE setup](https://force-eo.readthedocs.io/en/latest/howto/level1-csd.html) for more information.
 
