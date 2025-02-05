@@ -11,6 +11,7 @@ conda create --name SITScomp python==3.9
 conda activate SITScomp
 cd /path/to/repository/SITS_composite
 pip install -r requirements.txt
+sudo apt install gdal-bin aws-cli
 ```
 Notes: 
 The repository is build upon FORCE-Datacube and - Framework (Docker, recommended FORCE-Version 3.7.11)
@@ -25,10 +26,12 @@ _Can also work with other versions but be careful with other libraries or change
 ### Previous setup before running the script
 
 Currently, Landsat data can be downloaded without a login, but downloading Sentinel-2  
-data requires authentication. This is done through gsutil and gcloud only needs to be done once before the first run. 
-The credentials will be stored in a file called .boto in the user’s home directory[Level-1C FORCE setup](https://force-eo.readthedocs.io/en/latest/howto/level1-csd.html)
-Get the HMAC key from [the gcloud services](https://console.cloud.google.com/storage/settings) > Interoperability, 
-create your key and use it as a credential. 
+data requires authentication. This is done through gcloud only needs to be done once before the first run. 
+Running gcloud will create a file called .boto normally in your home user directory (you will need to define it's location within the main script).
+You can follow the instructions on 
+[the gcloud services](https://cloud.google.com/sdk/docs/install) website. Check the [Level-1C FORCE setup](https://force-eo.readthedocs.io/en/latest/howto/level1-csd.html) for more information.
+
+
 
 ### Basics
 
@@ -38,13 +41,14 @@ The script is based on the following folder structure:
 
 **To use the scripts:**
 
-Specify parameters within the main scripts and execute them. The Script should be straightforward. 
-The parameter file is recommendable to check if before running.
-
-* L1C data
+You will need to create a directory for the project and use it as a _base_path_. 
+Specify your parameters within the main scripts and execute them. 
+The first function creates the folder structure of the project and you can store your aoi in it.
+To create the L2A data is recommendable to check the parameter file in advance. The type of data downloaded is:
+* L1C data:
 Level 1 data are radiometrically calibrated and georectified.
 
-* L2A data
+* L2A data:
 Level 2 data most notably include some sort of atmospheric correction and probably other corrections like topographic 
 correction.
 
