@@ -35,12 +35,12 @@ You can follow the instructions on
 
 The script is based on the following folder structure:
 
-![structure](img/SITS_class_image.jpg)
+![structure](img/SITS_class_image.png)
 
 **To use the scripts:**
 
 You will need to create a directory for the project and use it as a _base_path_. 
-Specify your parameters within the main scripts and execute them. 
+Specify your parameters within the main script and execute them. 
 The first function creates the folder structure of the project and you can store your aoi in it.
 To create the L2A data is recommendable to check the parameter file in advance. The type of data downloaded is:
 * L1C data:
