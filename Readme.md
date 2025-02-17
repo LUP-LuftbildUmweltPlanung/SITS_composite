@@ -6,16 +6,19 @@ The code uses Satellite Image Time Series (SITS) composite based on [FORCE Time 
 
 ## 1. Installing
 
-The basic parameters installations are:
+The basic parameters installations are implemented for Ubuntu 22.04 "jammy":
+
 
 ```
 conda create --name SITScomp python==3.9
 conda activate SITScomp
 cd /path/to/repository/SITS_composite
 pip install -r requirements.txt
-sudo apt install gdal-bin aws-cli
+sudo snap install aws-cli --classic
+gdalinfo --version #Check if you have it already in your system, if not run:
+sudo apt install gdal-bin
 ```
-Notes: 
+Notes:
 The repository is build upon FORCE-Datacube and Framework (Docker, recommended FORCE-Version 3.7.11). Check
 [How to install FORCE with Docker](https://force-eo.readthedocs.io/en/latest/setup/docker.html#docker) for more information.
 
