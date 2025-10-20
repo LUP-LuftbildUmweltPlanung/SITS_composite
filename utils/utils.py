@@ -8,11 +8,14 @@ import geopandas as gpd
 def create_folder_structure(base_path):
     # Define the folder structure
     folder_structure = [
+        'ard',
+        'log',
+        'provenance',
+        'temp',
         'process',
-        'process/data',
+        #'process/vitalitat_3cities_data',
         "process/results/",
         'process/results/level1c_data',
-        "process/results/level2a_data",
         'process/temp/',
         'process/temp/catalogues',
         "process/temp/dem",
@@ -87,7 +90,7 @@ def level1_csd(local_dir, base_path, boto_dir, aois, no_act, date_range, sensors
 
     # Construct the command
     cmd = (
-        f'sudo docker run -v {local_dir} -v {boto_dir} -u "$(id -u):$(id -g)" davidfrantz/force '
+        f'sudo docker run -v {local_dir} -v {boto_dir} -u "$(id -u):$(id -g)" davidfrantz/force:latest '
         f'force-level1-csd {no_act} -d {date_range} -s {sensors} -c {cloud_cover} '
         f'{base_path}/process/temp/catalogues {base_path}/process/results/level1c_data '
         f'{base_path}/process/temp/queue.txt {aois}'
@@ -96,7 +99,7 @@ def level1_csd(local_dir, base_path, boto_dir, aois, no_act, date_range, sensors
     try:
         # Execute the command using subprocess
         subprocess.run(cmd, shell=True, check=True)
-        #print("L1C data downloaded successfully.")
+        #print("L1C vitalitat_3cities_data downloaded successfully.")
     except subprocess.CalledProcessError as e:
         # Detailed error message
         print(f"Error downloading L1C:{e.returncode}.")
@@ -122,13 +125,28 @@ def parameter_file(base_path, aois):
     shutil.copy(prm_source, prm_dest)
 
     # Define replacements
+    # Matching the harmonic pipeline grid definition (EPSG:3035 / 30 km tiles)
+    etrs89_laea_projection = ('PROJCS["ETRS89 / LAEA Europe",GEOGCS["ETRS89",DATUM['
+                              '"European_Terrestrial_Reference_System_1989",SPHEROID["GRS 1980",'
+                              '6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG",'
+                              '"6258"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",'
+                              '0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4258"]],'
+                              'PROJECTION["Lambert_Azimuthal_Equal_Area"],PARAMETER["latitude_of_center",52],'
+                              'PARAMETER["longitude_of_center",10],PARAMETER["false_easting",4321000],'
+                              'PARAMETER["false_northing",3210000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],'
+                              'AUTHORITY["EPSG","3035"]]')
+
     replacements = {
         "FILE_QUEUE = NULL": f"FILE_QUEUE = {base_path}/process/temp/queue.txt",
-        "DIR_LEVEL2 = NULL": f"DIR_LEVEL2 = {base_path}/process/results/level2a_data",
-        "DIR_LOG = NULL": f"DIR_LOG = {base_path}/process/temp/log",
-        "DIR_PROVENANCE = NULL": f"DIR_PROVENANCE = {base_path}/process/temp/provenance",
-        "DIR_TEMP = NULL": f"DIR_TEMP = {base_path}/process/temp",
-        "FILE_DEM = NULL": f"FILE_DEM = {base_path}/process/temp/dem/nasa.vrt"}
+        "DIR_LEVEL2 = NULL": f"DIR_LEVEL2 = {base_path}/ard",
+        "DIR_LOG = NULL": f"DIR_LOG = {base_path}/log",
+        "DIR_PROVENANCE = NULL": f"DIR_PROVENANCE = {base_path}/provenance",
+        "DIR_TEMP = NULL": f"DIR_TEMP = {base_path}/temp",
+        "FILE_DEM = NULL": f"FILE_DEM = {base_path}/process/temp/dem/nasa.vrt",
+        "PROJECTION = GLANCE7": f"PROJECTION = {etrs89_laea_projection}",
+        "ORIGIN_LON = 00": "ORIGIN_LON = -25.000000",
+        "ORIGIN_LAT = 00": "ORIGIN_LAT = 60.000000",
+    }
 
     # Replace parameters in the copied .prm file
     replace_parameters(prm_dest, replacements)
@@ -141,11 +159,39 @@ def execute_prm_file(base_path, boto_dir, local_dir):
     try:
         # Execute the command using subprocess
         subprocess.run(cmd, shell=True, check=True)
-        #print("L1C data downloaded successfully.")
+        #print("L1C vitalitat_3cities_data downloaded successfully.")
+        return True
     except subprocess.CalledProcessError as e:
         # Detailed error message
         print(f"Error downloading L2A:{e.returncode}")
         print(f"Command: {e.cmd}")
+        return False
 
 
+def cleanup_level1_data(base_path):
+    level1_dir = os.path.join(base_path, "process/results/level1c_data")
+    if os.path.isdir(level1_dir):
+        shutil.rmtree(level1_dir)
+        print(f"Removed L1C data at: {level1_dir}")
+    else:
+        print(f"No L1C data directory found at: {level1_dir}")
 
+
+def flatten_level2_output(base_path):
+    ard_dir = os.path.join(base_path, "ard")
+    europe_dir = os.path.join(ard_dir, "europe")
+    if not os.path.isdir(europe_dir):
+        print(f"No nested 'europe' directory found under: {ard_dir}")
+        return
+
+    for entry in os.listdir(europe_dir):
+        src = os.path.join(europe_dir, entry)
+        dest = os.path.join(ard_dir, entry)
+        if os.path.exists(dest):
+            print(f"Skipping move for {src}; destination already exists: {dest}")
+            continue
+        shutil.move(src, dest)
+        print(f"Moved {src} -> {dest}")
+
+    shutil.rmtree(europe_dir)
+    print(f"Removed nested directory: {europe_dir}")

@@ -63,7 +63,7 @@ DO_REPROJ = TRUE
 # are generated in DIR_LEVEL2. If you want to work with force-higher-level
 # routines, give TRUE.
 # Type: Logical. Valid values: {TRUE,FALSE}
-DO_TILE = FALSE
+DO_TILE = TRUE
 # This is the tile allow-list. It is an optional file that holds all tiles
 # that should be output. Tiles, which are not specified in this file are
 # not written to disc. This paremeter is ignored if DO_TILE = FALSE.
@@ -99,8 +99,8 @@ RESOLUTION_SENTINEL2 = 10
 # numbers. Not used if DO_TILE = FALSE.
 # Type: Double. Valid range: [-90,90]
 # Type: Double. Valid range: [-180,180]
-ORIGIN_LON = 55
-ORIGIN_LAT = -6
+ORIGIN_LON = 00
+ORIGIN_LAT = 00
 # This defines the target coordinate system. If DO_REPROJ = FALSE, the
 # projection string can be NULL. The coordinate system must either be
 # given as WKT string - or can be a predefined coordinate/grid system.
@@ -266,8 +266,8 @@ TIER = 1
 # it is adviced to use less processes and more threads per process. The
 # number of processes and threads is given by following parameters.
 # Type: Integer. Valid range: [1,...
-NPROC = 32
-NTHREAD = 2
+NPROC = 9
+NTHREAD = 3
 # This parameter controls whether the individual bands of the Level 1 input
 # images are read sequentially or in parallel. Note that we observed two kinds
 # of GDAL installation: (1) the JPEG driver reads each band parallely, but 
@@ -280,7 +280,7 @@ PARALLEL_READS = FALSE
 # ful to prevent I/O jams when using a lot of processes. The delay is given
 # in seconds.
 # Type: Integer. Valid range: [0,...
-DELAY = 3
+DELAY = 5
 # This parameter sets a timeout for unzipping the Level 1 data (only applies when
 # images are still in zip/tar.gz format. Only applies for force-level2).
 # The timeout is given in seconds.

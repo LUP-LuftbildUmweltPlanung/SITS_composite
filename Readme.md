@@ -19,8 +19,9 @@ gdalinfo --version #Check if you have it already in your system, if not run:
 sudo apt install gdal-bin
 ```
 Notes:
-The repository is build upon FORCE-Datacube and Framework (Docker, recommended FORCE-Version 3.7.11). Check
-[How to install FORCE with Docker](https://force-eo.readthedocs.io/en/latest/setup/docker.html#docker) for more information.
+code is build upon FORCE-Datacube and -Framework (Docker, recommended FORCE-Version 3.7.11)
+
+* [How to install FORCE with Docker](https://force-eo.readthedocs.io/en/latest/setup/docker.html#docker).
 
 ## 2. Getting Started
 
