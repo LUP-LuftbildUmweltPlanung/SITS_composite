@@ -1,7 +1,9 @@
 import os
 import subprocess
-import time
 import shutil
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Dict, List, Optional
 import geopandas as gpd
 
 
@@ -77,16 +79,23 @@ def download_defined_catalogue(catalogue_path , local_dir):
         print(f"Command: {e.cmd}")
 
 
-def queue_file(base_path):
-    cmd = f"touch {base_path}/process/temp/queue.txt"
+def queue_file(base_path, force=False):
+    queue_path = Path(base_path) / "process" / "temp" / "queue.txt"
+    if queue_path.exists() and not force:
+        print(f"Queue file already exists: {queue_path}")
+        return str(queue_path)
+
+    queue_path.parent.mkdir(parents=True, exist_ok=True)
+    cmd = f"touch {queue_path}"
 
     try:
-        subprocess.run([cmd], shell=True,check=True)
-        print(f"Created queue file")
+        subprocess.run([cmd], shell=True, check=True)
+        print(f"Created queue file: {queue_path}")
     except subprocess.CalledProcessError as e:
         print(f"Error creating queue file: {e}")
+    return str(queue_path)
 
-def level1_csd(local_dir, base_path, boto_dir, aois, no_act, date_range, sensors, cloud_cover):
+def level1_csd(local_dir, base_path, boto_dir, aois, no_act, date_range, sensors, cloud_cover, auto_confirm=True):
 
     # Construct the command
     cmd = (
@@ -98,7 +107,10 @@ def level1_csd(local_dir, base_path, boto_dir, aois, no_act, date_range, sensors
 
     try:
         # Execute the command using subprocess
-        subprocess.run(cmd, shell=True, check=True)
+        run_kwargs = {"shell": True, "check": True}
+        if auto_confirm:
+            run_kwargs.update({"text": True, "input": "y\n"})
+        subprocess.run(cmd, **run_kwargs)
         #print("L1C vitalitat_3cities_data downloaded successfully.")
     except subprocess.CalledProcessError as e:
         # Detailed error message
@@ -117,11 +129,12 @@ def replace_parameters(filename, replacements):
 
 
 def parameter_file(base_path, aois):
-    base_path_script = os.getcwd()
+    base_path_script = Path(__file__).resolve().parent.parent
 
     # Copy .prm file
-    prm_source = f"{base_path_script}/force/l2ps.prm"
-    prm_dest = f"{base_path}/process/temp/prm_file/tsa.prm"
+    prm_source = base_path_script / "force" / "l2ps.prm"
+    prm_dest = Path(base_path) / "process" / "temp" / "prm_file" / "tsa.prm"
+    prm_dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy(prm_source, prm_dest)
 
     # Define replacements
@@ -135,6 +148,8 @@ def parameter_file(base_path, aois):
                               'PARAMETER["longitude_of_center",10],PARAMETER["false_easting",4321000],'
                               'PARAMETER["false_northing",3210000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],'
                               'AUTHORITY["EPSG","3035"]]')
+
+    base_path = Path(base_path)
 
     replacements = {
         "FILE_QUEUE = NULL": f"FILE_QUEUE = {base_path}/process/temp/queue.txt",
@@ -195,3 +210,85 @@ def flatten_level2_output(base_path):
 
     shutil.rmtree(europe_dir)
     print(f"Removed nested directory: {europe_dir}")
+
+
+@dataclass
+class PipelineState:
+    catalogue_files: List[Path]
+    queue_path: Optional[Path]
+    level1_products: List[Path]
+    dem_path: Optional[Path]
+    parameter_path: Optional[Path]
+    tiles: Dict[str, List[Path]]
+    europe_dir_present: bool
+
+    @property
+    def has_catalogues(self) -> bool:
+        return bool(self.catalogue_files)
+
+    @property
+    def queue_exists(self) -> bool:
+        return self.queue_path is not None
+
+    @property
+    def has_level1_data(self) -> bool:
+        return bool(self.level1_products)
+
+    @property
+    def dem_exists(self) -> bool:
+        return self.dem_path is not None
+
+    @property
+    def parameter_exists(self) -> bool:
+        return self.parameter_path is not None
+
+    @property
+    def tile_count(self) -> int:
+        return len(self.tiles)
+
+    @property
+    def tif_count(self) -> int:
+        return sum(len(files) for files in self.tiles.values())
+
+
+def inspect_pipeline_state(base_path: str) -> PipelineState:
+    base = Path(base_path)
+    catalogue_dir = base / "process" / "temp" / "catalogues"
+    catalogue_files = [p for p in catalogue_dir.glob("*") if p.is_file()] if catalogue_dir.exists() else []
+
+    queue_path = base / "process" / "temp" / "queue.txt"
+    queue_path = queue_path if queue_path.exists() and queue_path.stat().st_size > 0 else None
+
+    level1_dir = base / "process" / "results" / "level1c_data"
+    level1_products: List[Path] = []
+    if level1_dir.exists():
+        for entry in level1_dir.iterdir():
+            if entry.is_dir() or entry.suffix in {".SAFE", ".tar", ".zip"} or entry.is_file():
+                level1_products.append(entry)
+
+    dem_path = base / "process" / "temp" / "dem" / "nasa.vrt"
+    dem_path = dem_path if dem_path.exists() else None
+
+    parameter_path = base / "process" / "temp" / "prm_file" / "tsa.prm"
+    parameter_path = parameter_path if parameter_path.exists() else None
+
+    ard_dir = base / "ard"
+    tiles: Dict[str, List[Path]] = {}
+    if ard_dir.exists():
+        for tile_dir in ard_dir.iterdir():
+            if tile_dir.is_dir() and tile_dir.name.startswith("X"):
+                tif_files = [p for p in tile_dir.glob("*.tif")]
+                if tif_files:
+                    tiles[tile_dir.name] = tif_files
+
+    europe_dir_present = (ard_dir / "europe").is_dir()
+
+    return PipelineState(
+        catalogue_files=catalogue_files,
+        queue_path=queue_path,
+        level1_products=level1_products,
+        dem_path=dem_path,
+        parameter_path=parameter_path,
+        tiles=tiles,
+        europe_dir_present=europe_dir_present,
+    )
