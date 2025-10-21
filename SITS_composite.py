@@ -20,18 +20,19 @@ from utils.utils import (
 )
 from utils.vrt_dem_download import download_dem
 
-
-BASE_PATH = Path("/rvt_mount/force/FORCE/C1/L2")
-LOCAL_DIR = "/rvt_mount:/rvt_mount"
-BOTO_DIR = "/home/eouser/.boto:/home/docker/.boto"
-AOI = Path("/rvt_mount/3DTests/data/harm_data/ilmenau.shp")
+# User-configurable parameters
+BASE_PATH = Path("/rvt_mount/force/FORCE/C1/L2") # Base directory for FORCE processing
+LOCAL_DIR = "/rvt_mount:/rvt_mount" # Local directory mapping for FORCE
+BOTO_DIR = "/home/eouser/.boto:/home/docker/.boto" # Boto configuration mapping
+AOI = Path("/rvt_mount/3DTests/data/harm_data/ilmenau.shp") # Area of Interest shapefile
 
 # L1C parameters
 NO_ACT = ""  # leave empty to run normally; use "-n" for dry run
-DATE_RANGE = "20160101,20180630"
-CLOUD_COVER = "0,30"
-SENSORS = "S2A,S2B"
+DATE_RANGE = "20160101,20180630"  # YYYYMMDD,YYYYMMDD
+CLOUD_COVER = "0,30" # min,max percentage of cloud cover
+SENSORS = "S2A,S2B" # comma-separated list of sensors to include
 
+#############################################
 
 def configure_logging(verbose: bool) -> None:
     level = logging.DEBUG if verbose else logging.INFO
